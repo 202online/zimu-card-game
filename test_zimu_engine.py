@@ -1,6 +1,24 @@
 import unittest
 
-from zimu_engine import Card, CardType, ClashEngine, PlayerBoard, Rank
+from zimu_engine import (
+    CORE_POOL,
+    DECK_1,
+    DECK_2,
+    MASTER_CARD_DATABASE,
+    Card,
+    CardType,
+    ClashEngine,
+    PlayerBoard,
+    Rank,
+)
+
+
+class CardDatabaseTests(unittest.TestCase):
+    def test_master_database_indexes_each_card_definition(self):
+        definitions = [*CORE_POOL.values(), *DECK_1, *DECK_2]
+        self.assertEqual(len(MASTER_CARD_DATABASE), len(definitions))
+        for card in definitions:
+            self.assertIs(MASTER_CARD_DATABASE[card.name], card)
 
 
 class DeployTests(unittest.TestCase):
@@ -79,15 +97,28 @@ class ClashTests(unittest.TestCase):
         self.assertIsNone(attacker.lanes[0].rearguard)
         self.assertEqual(attacker.graveyard, [attacking_card, rear_card])
 
-    def test_implosion_and_invalid_lane(self):
+    def test_zero_stat_zimu_is_safe_in_empty_lane(self):
         attacker = PlayerBoard("Attacker")
         defender = PlayerBoard("Defender")
         zero_card = Card("Zero", CardType.ZIMU, Rank.CORE)
         attacker.lanes[0].vanguard = zero_card
 
         self.assertEqual(ClashEngine.resolve_lane_clash(attacker, defender, 3), "ERROR: Invalid lane.")
-        self.assertEqual(ClashEngine.resolve_lane_clash(attacker, defender, 0), "IMPLODED")
-        self.assertEqual(attacker.graveyard, [zero_card])
+        self.assertEqual(ClashEngine.resolve_lane_clash(attacker, defender, 0), "DIRECT STRIKE: 0")
+        self.assertIs(attacker.lanes[0].vanguard, zero_card)
+        self.assertEqual(attacker.graveyard, [])
+
+    def test_zero_attack_does_not_destroy_zero_hp_zimu(self):
+        attacker = PlayerBoard("Attacker")
+        defender = PlayerBoard("Defender")
+        zero_attacker = Card("Zero attacker", CardType.ZIMU, Rank.CORE)
+        zero_defender = Card("Zero defender", CardType.ZIMU, Rank.CORE, atk=2, hp=0)
+        attacker.lanes[0].vanguard = zero_attacker
+        defender.lanes[0].vanguard = zero_defender
+
+        self.assertEqual(ClashEngine.resolve_lane_clash(attacker, defender, 0), "NO DAMAGE")
+        self.assertIs(attacker.lanes[0].vanguard, zero_attacker)
+        self.assertIs(defender.lanes[0].vanguard, zero_defender)
 
 
 if __name__ == "__main__":
