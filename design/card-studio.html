@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1019">
+  <title>Flux Point: Zimu — Card Studio</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b1019;
+      color: #eef4fa;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --panel: #111a26;
+      --panel-line: #253444;
+      --muted: #9eacba;
+      --cyan: #62e5df;
+      --rank: #51e6ad;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 75% 4%, #12313a 0, transparent 34rem),
+        linear-gradient(145deg, #0b1019, #101722 65%, #0b1019);
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    .app {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 28px clamp(16px, 4vw, 42px) 36px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #263441;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid #3c777b;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #16363d, #111c28);
+      color: var(--cyan);
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #c5d5df;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px #62e5df88;
+    }
+
+    .intro { padding: 30px 0 22px; }
+
+    .eyebrow {
+      margin: 0 0 9px;
+      color: var(--cyan);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 680;
+      letter-spacing: -.04em;
+    }
+
+    .intro-copy {
+      max-width: 560px;
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(280px, 390px) minmax(300px, 1fr);
+      gap: clamp(20px, 5vw, 58px);
+      align-items: start;
+    }
+
+    .editor {
+      padding: 20px;
+      border: 1px solid var(--panel-line);
+      border-radius: 16px;
+      background: linear-gradient(155deg, #131e2a, #101722);
+      box-shadow: 0 18px 45px #0003;
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #263441;
+    }
+
+    .panel-heading h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .step {
+      color: #8293a3;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 12px;
+      padding-top: 17px;
+    }
+
+    .field { min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      display: block;
+      margin: 0 0 7px;
+      color: #b7c5d0;
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    input, select, textarea {
+      display: block;
+      width: 100%;
+      border: 1px solid #304252;
+      border-radius: 8px;
+      outline: none;
+      background: #0d1520;
+      color: #f2f7fa;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    input, select {
+      height: 40px;
+      padding: 0 11px;
+    }
+
+    textarea {
+      min-height: 84px;
+      padding: 10px 11px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px #62e5df20;
+    }
+
+    .hint {
+      margin: 7px 0 0;
+      color: #8192a1;
+      font-size: 10px;
+      line-height: 1.45;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 17px;
+      padding-top: 14px;
+      border-top: 1px solid #263441;
+    }
+
+    .print-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 36px;
+      margin-top: 14px;
+      padding: 0 12px;
+      border: 1px solid #438d8a;
+      border-radius: 8px;
+      background: #153139;
+      color: #d7fffa;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .print-button:hover { background: #1a4148; }
+    .print-button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+    .toggle-copy strong {
+      display: block;
+      color: #dce6ed;
+      font-size: 11px;
+    }
+
+    .toggle-copy span {
+      display: block;
+      margin-top: 3px;
+      color: #8192a1;
+      font-size: 10px;
+    }
+
+    .switch {
+      position: relative;
+      width: 42px;
+      height: 24px;
+      flex: 0 0 auto;
+    }
+
+    .switch input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .switch span {
+      position: absolute;
+      inset: 0;
+      border: 1px solid #425464;
+      border-radius: 99px;
+      background: #1b2936;
+      cursor: pointer;
+      transition: .18s;
+    }
+
+    .switch span::after {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #b8c5ce;
+      content: "";
+      transition: .18s;
+    }
+
+    .switch input:checked + span {
+      border-color: #3c9f9e;
+      background: #1b4548;
+    }
+
+    .switch input:checked + span::after {
+      transform: translateX(18px);
+      background: #70ece0;
+    }
+
+    .switch input:focus-visible + span {
+      outline: 2px solid var(--cyan);
+      outline-offset: 3px;
+    }
+
+    .preview-area {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 4px;
+    }
+
+    .preview-heading {
+      display: flex;
+      width: min(100%, 370px);
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .preview-heading h2 {
+      margin: 0;
+      color: #aab9c5;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .preview-heading span {
+      color: #7d8f9e;
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card-wrap {
+      width: min(100%, 340px);
+      filter: drop-shadow(0 22px 35px #0008);
+    }
+
+    .card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 816 / 1116;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(ellipse at 54% 40%, color-mix(in srgb, var(--rank) 17%, transparent), transparent 49%),
+        linear-gradient(152deg, #101b28 0%, #09121d 54%, #111923 100%);
+      color: #f1f6fa;
+      container-type: inline-size;
+    }
+
+    .card::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background:
+        linear-gradient(128deg, transparent 0 41%, #a9fcf90c 41.1% 41.35%, transparent 41.45%),
+        linear-gradient(0deg, #e0ffff09 1px, transparent 1px),
+        linear-gradient(90deg, #e0ffff08 1px, transparent 1px);
+      background-size: auto, 8.33% 8.33%, 8.33% 8.33%;
+      content: "";
+      mask-image: linear-gradient(145deg, #000 0%, transparent 67%);
+    }
+
+    .trim {
+      position: absolute;
+      z-index: 1;
+      inset: 2.96% 4.04%;
+      border: 1px solid color-mix(in srgb, var(--rank) 72%, #d7ecf4);
+      border-radius: 3.3cqw;
+      box-shadow: inset 0 0 0 1px #ffffff12, 0 0 22px color-mix(in srgb, var(--rank) 18%, transparent);
+      pointer-events: none;
+    }
+
+    .inner-line {
+      position: absolute;
+      z-index: 2;
+      inset: 4.3% 6.1%;
+      border: 1px solid color-mix(in srgb, var(--rank) 55%, transparent);
+      border-radius: 2.5cqw;
+      opacity: .7;
+      pointer-events: none;
+    }
+
+    .safe-content {
+      position: absolute;
+      z-index: 3;
+      inset: 6.32% 8.64%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 8.5%;
+    }
+
+    .card-title {
+      overflow: hidden;
+      margin: 0;
+      font-size: clamp(17px, 5.7cqw, 24px);
+      font-weight: 800;
+      letter-spacing: -.035em;
+      line-height: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rank-tag {
+      flex: 0 0 auto;
+      padding: 5px 7px;
+      border: 1px solid color-mix(in srgb, var(--rank) 70%, transparent);
+      border-radius: 5px;
+      background: color-mix(in srgb, var(--rank) 11%, #09121d);
+      color: var(--rank);
+      font-size: clamp(8px, 2.15cqw, 10px);
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .type-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 5%;
+      color: #b7c8d3;
+      font-size: clamp(8px, 2.3cqw, 10px);
+      font-weight: 750;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .type-mark {
+      width: 6px;
+      height: 6px;
+      border-radius: 2px;
+      background: var(--rank);
+      box-shadow: 0 0 9px var(--rank);
+      transform: rotate(45deg);
+    }
+
+    .art-window {
+      position: relative;
+      display: grid;
+      min-height: 0;
+      flex: 1 1 auto;
+      place-items: center;
+      overflow: hidden;
+      margin: 2.5% 0 3.5%;
+      border: 1px solid #a9c5d52b;
+      border-radius: 2.8cqw;
+      background:
+        radial-gradient(ellipse at 50% 49%, color-mix(in srgb, var(--rank) 18%, transparent), transparent 54%),
+        linear-gradient(145deg, #18303c, #0b1621 55%, #182431);
+    }
+
+    .art-window::before,
+    .art-window::after {
+      position: absolute;
+      width: 56%;
+      aspect-ratio: 1;
+      border: 1px solid color-mix(in srgb, var(--rank) 52%, transparent);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .art-window::before {
+      transform: scaleY(.43) rotate(-35deg);
+      box-shadow: 0 0 25px color-mix(in srgb, var(--rank) 11%, transparent);
+    }
+
+    .art-window::after {
+      transform: scaleY(.43) rotate(35deg);
+      opacity: .72;
+    }
+
+    .flux-core {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      width: 20%;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid color-mix(in srgb, var(--rank) 75%, white);
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--rank) 38%, #172b35), #0c1822 70%);
+      box-shadow: 0 0 0 8px color-mix(in srgb, var(--rank) 8%, transparent), 0 0 32px color-mix(in srgb, var(--rank) 36%, transparent);
+    }
+
+    .flux-core::before {
+      width: 32%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #edffff;
+      box-shadow: 0 0 15px var(--rank);
+      content: "";
+    }
+
+    .art-label {
+      position: absolute;
+      right: 10px;
+      bottom: 9px;
+      color: #afc2ce;
+      font-size: clamp(7px, 1.8cqw, 9px);
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .rules-box {
+      flex: 0 0 auto;
+      min-height: 18%;
+      padding: 9px 10px;
+      border: 1px solid #a9c5d524;
+      border-radius: 2cqw;
+      background: #07111b9c;
+    }
+
+    .rules-caption {
+      margin: 0 0 4px;
+      color: var(--rank);
+      font-size: clamp(7px, 1.8cqw, 9px);
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .rules-copy {
+      margin: 0;
+      color: #e0e9ee;
+      font-size: clamp(9px, 2.55cqw, 11px);
+      line-height: 1.36;
+      overflow-wrap: anywhere;
+    }
+
+    .stats-row {
+      display: flex;
+      min-height: 12%;
+      align-items: end;
+      justify-content: space-between;
+      padding-top: 5px;
+    }
+
+    .stats {
+      display: flex;
+      align-items: end;
+      gap: 8px;
+    }
+
+    .stat {
+      min-width: 51px;
+      padding: 5px 8px 6px;
+      border-left: 2px solid var(--rank);
+      background: linear-gradient(90deg, color-mix(in srgb, var(--rank) 14%, transparent), transparent);
+    }
+
+    .stat-label {
+      display: block;
+      color: #99adba;
+      font-size: clamp(7px, 1.7cqw, 8px);
+      font-weight: 750;
+      letter-spacing: .13em;
+    }
+
+    .stat-value {
+      display: block;
+      margin-top: 1px;
+      color: #fff;
+      font-size: clamp(17px, 5.4cqw, 23px);
+      font-weight: 820;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .lp-cost {
+      padding: 6px 9px;
+      border: 1px solid #8da3b344;
+      border-radius: 6px;
+      color: #d2e0e7;
+      font-size: clamp(8px, 2cqw, 10px);
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .guides {
+      position: absolute;
+      z-index: 5;
+      display: none;
+      border: 1px dashed #fff;
+      pointer-events: none;
+    }
+
+    .guides.cut {
+      inset: 2.96% 4.04%;
+      border-color: #ffce75;
+    }
+
+    .guides.safe {
+      inset: 6.32% 8.64%;
+      border-color: #78f3dc;
+    }
+
+    .show-guides .guides { display: block; }
+
+    .guide-note {
+      width: min(100%, 370px);
+      margin: 13px 0 0;
+      color: #8192a1;
+      font-size: 10px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .guide-note strong { color: #c6d3db; }
+    .guide-cut { color: #ffce75; }
+    .guide-safe { color: #78f3dc; }
+
+    .footer-note {
+      margin-top: 26px;
+      padding-top: 16px;
+      border-top: 1px solid #263441;
+      color: #8394a2;
+      font-size: 10px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .card[data-type="RELIC"] .rank-tag,
+    .card[data-type="TACTIC"] .rank-tag { display: none; }
+
+    .card[data-type="RELIC"] .stats,
+    .card[data-type="TACTIC"] .stats { visibility: hidden; }
+
+    @media (max-width: 760px) {
+      .workspace { grid-template-columns: minmax(0, 1fr); }
+      .preview-area { padding-top: 6px; }
+      .card-wrap { width: min(78vw, 340px); }
+      .editor { max-width: 520px; width: 100%; margin: 0 auto; }
+      .topbar { padding-bottom: 18px; }
+    }
+
+    @media (max-width: 400px) {
+      .app { padding-inline: 12px; }
+      .editor { padding: 15px; }
+      .status { font-size: 10px; }
+    }
+
+    @page {
+      size: 2.72in 3.72in;
+      margin: 0;
+    }
+
+    @media print {
+      :root, body {
+        width: 2.72in;
+        height: 3.72in;
+        min-width: 0;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .app {
+        width: 2.72in;
+        height: 3.72in;
+        margin: 0;
+        padding: 0;
+      }
+
+      .topbar, .intro, .editor, .preview-heading, .guide-note, .footer-note {
+        display: none !important;
+      }
+
+      .workspace, .preview-area, .card-wrap {
+        display: block;
+        width: 2.72in;
+        height: 3.72in;
+        margin: 0;
+        padding: 0;
+        filter: none;
+      }
+
+      .card {
+        width: 2.72in;
+        height: 3.72in;
+        aspect-ratio: auto;
+        border: 0;
+      }
+
+      .guides { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">Φ</div>
+        <div>
+          <p class="brand-name">Flux Point</p>
+          <p class="brand-subtitle">Zimu · Card Studio</p>
+        </div>
+      </div>
+      <div class="status"><span class="status-dot" aria-hidden="true"></span>Template preview</div>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Design system · 01</p>
+      <h1 id="page-title">Build a Zimu card</h1>
+      <p class="intro-copy">A clean, high-contrast card face with one distinctive Flux mark. Edit the details and see the print layout update instantly.</p>
+    </section>
+
+    <section class="workspace" aria-label="Card editor and preview">
+      <form class="editor" id="card-form">
+        <div class="panel-heading">
+          <h2>Card details</h2>
+          <span class="step">Step 1 of 2</span>
+        </div>
+        <div class="fields">
+          <div class="field full">
+            <label for="card-name">Card name</label>
+            <input id="card-name" name="name" value="Spark" maxlength="24" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="card-type">Card type</label>
+            <select id="card-type" name="type">
+              <option value="ZIMU">Zimu</option>
+              <option value="RELIC">Relic</option>
+              <option value="TACTIC">Tactic</option>
+            </select>
+          </div>
+          <div class="field" id="rank-field">
+            <label for="card-rank">Rank</label>
+            <select id="card-rank" name="rank">
+              <option value="CORE">Core</option>
+              <option value="MILITIA">Militia</option>
+              <option value="MYTHIC">Mythic</option>
+              <option value="APEX">Apex</option>
+            </select>
+          </div>
+          <div class="field" id="atk-field">
+            <label for="card-atk">ATK</label>
+            <input id="card-atk" name="atk" type="number" min="0" max="99" value="3">
+          </div>
+          <div class="field" id="hp-field">
+            <label for="card-hp">HP</label>
+            <input id="card-hp" name="hp" type="number" min="0" max="99" value="1">
+          </div>
+          <div class="field">
+            <label for="card-cost">LP cost</label>
+            <input id="card-cost" name="cost" type="number" min="0" max="99" value="0">
+          </div>
+          <div class="field full">
+            <label for="card-text">Rules text</label>
+            <textarea id="card-text" name="text" maxlength="220">Vanilla</textarea>
+            <p class="hint">Short sentences are easier to scan at table distance.</p>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-copy">
+            <strong>Print guides</strong>
+            <span>Show cut line and safe zone</span>
+          </div>
+          <label class="switch" aria-label="Show print guides">
+            <input id="show-guides" type="checkbox" checked>
+            <span aria-hidden="true"></span>
+          </label>
+        </div>
+        <button class="print-button" type="button" id="print-card">Print card</button>
+      </form>
+
+      <section class="preview-area" aria-labelledby="preview-title">
+        <div class="preview-heading">
+          <h2 id="preview-title">Live preview</h2>
+          <span>2.72 × 3.72 in · 300 DPI</span>
+        </div>
+        <div class="card-wrap">
+          <article class="card show-guides" id="card" data-type="ZIMU" aria-label="Card preview">
+            <div class="trim" aria-hidden="true"></div>
+            <div class="inner-line" aria-hidden="true"></div>
+            <div class="guides cut" aria-hidden="true"></div>
+            <div class="guides safe" aria-hidden="true"></div>
+            <div class="safe-content">
+              <div class="card-topline">
+                <h3 class="card-title" id="preview-name">Spark</h3>
+                <span class="rank-tag" id="preview-rank">Core</span>
+              </div>
+              <div class="type-line">
+                <span class="type-mark" aria-hidden="true"></span>
+                <span id="preview-type">Zimu · Combatant</span>
+              </div>
+              <div class="art-window" aria-label="Abstract Flux artwork placeholder">
+                <div class="flux-core" aria-hidden="true"></div>
+                <span class="art-label">Flux signature · 01</span>
+              </div>
+              <div class="rules-box">
+                <p class="rules-caption">Ability</p>
+                <p class="rules-copy" id="preview-text">Vanilla</p>
+              </div>
+              <div class="stats-row">
+                <div class="stats" aria-label="Attack and hit points">
+                  <div class="stat"><span class="stat-label">ATK</span><span class="stat-value" id="preview-atk">3</span></div>
+                  <div class="stat"><span class="stat-label">HP</span><span class="stat-value" id="preview-hp">1</span></div>
+                </div>
+                <span class="lp-cost"><span id="preview-cost">0</span> LP</span>
+              </div>
+            </div>
+          </article>
+        </div>
+        <p class="guide-note"><strong class="guide-cut">Amber = cut line</strong> · <strong class="guide-safe">Mint = safe zone</strong><br>Keep all card text and bottom-left stats inside the mint line.</p>
+      </section>
+    </section>
+
+    <footer class="footer-note">Flux mark, rank accents, and layout are original design elements. Print output is sized to the specified full canvas with bleed.</footer>
+  </main>
+
+  <script>
+    const form = document.querySelector("#card-form");
+    const card = document.querySelector("#card");
+    const rankColors = {
+      CORE: "#51e6ad",
+      MILITIA: "#f0bf55",
+      MYTHIC: "#fa6677",
+      APEX: "#ff914d",
+    };
+    const typeLabels = {
+      ZIMU: "Zimu · Combatant",
+      RELIC: "Relic · Arsenal",
+      TACTIC: "Tactic · Instant",
+    };
+
+    function updatePreview() {
+      const data = new FormData(form);
+      const type = data.get("type");
+      const rank = data.get("rank");
+
+      document.querySelector("#preview-name").textContent = data.get("name") || "Unnamed";
+      document.querySelector("#preview-type").textContent = typeLabels[type];
+      document.querySelector("#preview-rank").textContent = rank[0] + rank.slice(1).toLowerCase();
+      document.querySelector("#preview-atk").textContent = data.get("atk") || "0";
+      document.querySelector("#preview-hp").textContent = data.get("hp") || "0";
+      document.querySelector("#preview-cost").textContent = data.get("cost") || "0";
+      document.querySelector("#preview-text").textContent = data.get("text") || "No ability text.";
+
+      card.dataset.type = type;
+      card.style.setProperty("--rank", rankColors[rank]);
+      document.querySelector("#rank-field").hidden = type !== "ZIMU";
+      document.querySelector("#atk-field").hidden = type !== "ZIMU";
+      document.querySelector("#hp-field").hidden = type !== "ZIMU";
+    }
+
+    form.addEventListener("input", updatePreview);
+    form.addEventListener("change", updatePreview);
+    document.querySelector("#show-guides").addEventListener("change", (event) => {
+      card.classList.toggle("show-guides", event.target.checked);
+    });
+    document.querySelector("#print-card").addEventListener("click", () => window.print());
+    updatePreview();
+  </script>
+</body>
+</html>
