@@ -1,4 +1,5 @@
 import unittest
+from collections import Counter
 
 from zimu_engine import (
     BINDER_RESERVES,
@@ -39,6 +40,14 @@ class CardDatabaseTests(unittest.TestCase):
         self.assertEqual(len(DECK_1), 48)
         self.assertEqual(len(DECK_2), 48)
         self.assertEqual(len(BINDER_RESERVES), 4)
+        expected_split = Counter({
+            CardType.ZIMU: 24,
+            CardType.RELIC: 12,
+            CardType.TACTIC: 12,
+        })
+        for deck in (DECK_1, DECK_2):
+            self.assertEqual(len({card.name for card in deck}), 48)
+            self.assertEqual(Counter(card.card_type for card in deck), expected_split)
         self.assertTrue({card.name for card in DECK_1}.isdisjoint(
             card.name for card in DECK_2
         ))
