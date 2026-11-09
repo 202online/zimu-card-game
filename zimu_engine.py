@@ -39,13 +39,13 @@ COMMON_CORE_POOL = {
     "Sentry": Card("Sentry", CardType.ZIMU, Rank.MILITIA, 2, 5, 2, "Opposing Core unblocked attackers deal 1 less direct damage to your LP pool."),
     "Bastion-Guard": Card("Bastion-Guard", CardType.ZIMU, Rank.MILITIA, 1, 6, 2),
     "Phalanx": Card("Phalanx", CardType.ZIMU, Rank.MILITIA, 2, 6, 2),
-    "Bulwark": Card("Bulwark", CardType.ZIMU, Rank.MILITIA, 1, 7, 3, "Permanently immune to enemy positioning Tactic spells."),
+    "Bulwark": Card("Bulwark", CardType.ZIMU, Rank.MILITIA, 1, 7, 3, "Immune to enemy positioning Tactic spells."),
     "Focus": Card("Focus", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column gains +2 ATK."),
     "Bastion": Card("Bastion", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column gains +2 HP."),
     "Aegis-Sigil": Card("Aegis-Sigil", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column is immune to Tactic destruction."),
     "Tether": Card("Tether", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column cannot be shifted horizontally."),
     "Iron-Anchor": Card("Iron-Anchor", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column gains +1 HP."),
-    "Fracture": Card("Fracture", CardType.TACTIC, None, 0, 0, 2, "Shatter one friendly active frontline Zimu to draw 3 cards immediately. [Surge]"),
+    "Fracture": Card("Fracture", CardType.TACTIC, None, 0, 0, 2, "Shatter one friendly active frontline Zimu to draw 3 cards. [Surge]"),
     "Siphon": Card("Siphon", CardType.TACTIC, None, 0, 0, 0, "Reduce a targeted enemy monster's current HP threshold by 2 points until End Phase. [Surge]"),
     "Blood-Tax": Card("Blood-Tax", CardType.TACTIC, None, 0, 0, 0, "Melt away -2 HP threshold from a targeted enemy blocker until End Phase. [Surge]"),
     "Flash-Deploy": Card("Flash-Deploy", CardType.TACTIC, None, 0, 0, 1, "Draw 2 cards immediately from your Combatant deck. [Surge]"),
@@ -83,7 +83,7 @@ DECK_1 = [
     Card("Siphon-Grid", CardType.RELIC, None, 0, 0, 2, "⚡ CLASH WINDOW. Steal 1 ATK from attacker and add to defender."),
     Card("Spikewall", CardType.RELIC, None, 0, 0, 2, "⚡ CLASH WINDOW. Adds +2 HP. Failed hit adds +2 to penalty."),
     Card("Prism", CardType.RELIC, None, 0, 0, 1, "Divert a single-target enemy spell card to an adjacent lane column."),
-    Card("Overload", CardType.TACTIC, None, 0, 0, 3, "Fuse all board ATK into one strike. Backlash if pierce > 5 LP. [Surge]"),
+    Card("Overload", CardType.TACTIC, None, 0, 0, 3, "Fuse all board ATK. Backlash if pierce > 5 LP. [Surge]"),
     Card("Divert", CardType.TACTIC, None, 0, 0, 0, "⚡ CLASH WINDOW. Force attack to target adjacent lane or miss. [Reflex]"),
     Card("Surge-Gate", CardType.TACTIC, None, 0, 0, 3, "Bypass Tribute scale for turn; deploy Zimu strictly for LP cost. [Surge]"),
     Card("Redline-Surge", CardType.TACTIC, None, 0, 0, 0, "Redline only. Selected lane Zimu can attack twice this phase. [Surge]"),
@@ -138,9 +138,54 @@ BINDER_RESERVES = [
     Card("Cataclysm", CardType.TACTIC, None, 0, 0, 4, "Board wipe. Instantly shatter all face-up frontline Zimu on both sides. [Surge]"),
 ]
 
-MASTER_CARD_DATABASE = {
+_CARD_DEFINITIONS = {
     card.name: card
     for card in (*COMMON_CORE_POOL.values(), *DECK_1, *DECK_2, *BINDER_RESERVES)
+}
+_CARD_DEFINITIONS["Slasher"] = Card("Slasher", CardType.ZIMU, Rank.MILITIA, 6, 1, 2)
+_CARD_DEFINITIONS["Grid-Freeze"] = Card("Grid-Freeze", CardType.TACTIC, None, 0, 0, 1, "CLASH WINDOW. Force an attacking lane column to close instantly after this battle. [Reflex]")
+_CARD_DEFINITIONS["Counter-Step"] = Card("Counter-Step", CardType.TACTIC, None, 0, 0, 0, "CLASH WINDOW. Swap positions of two active defenders before math hits. [Reflex]")
+_CARD_DEFINITIONS["Retaliate"] = Card("Retaliate", CardType.TACTIC, None, 0, 0, 2, "CLASH WINDOW. Force defender to strike back dealing its HP as damage to attacker. [Reflex]")
+_CARD_DEFINITIONS["Purge"] = Card("Purge", CardType.TACTIC, None, 0, 0, 1, "Choose and discard 1 card from opponent's hand at random. [Surge]")
+_CARD_DEFINITIONS["Nova"] = Card("Nova", CardType.TACTIC, None, 0, 0, 3, "Clear all Relics sitting across all back-row slots on the board. [Surge]")
+_CARD_DEFINITIONS["Mirror-Trap-Alpha"] = Card("Mirror-Trap-Alpha", CardType.TACTIC, None, 0, 0, 2, "CLASH WINDOW. Steal an incoming counter-trap and apply it to your unit. [Reflex]")
+_CARD_DEFINITIONS["Last-Stand"] = Card("Last-Stand", CardType.TACTIC, None, 0, 0, 0, "Trigger only at 5 LP or less. Front Zimu gains infinite HP for one battle. [Reflex]")
+
+DECK_1 = [
+    _CARD_DEFINITIONS[name]
+    for name in (
+        "Scrip", "Mite", "Gnat", "Vapor", "Dart", "Needle", "Spark", "Shard",
+        "Bolt", "Flint", "Twig", "Blink", "Wisp", "Sprout", "Talon", "Lycos",
+        "Ruin", "Hound", "Razor", "Slasher", "Cyclops", "Wyvern", "Chimera",
+        "Kraken", "Focus", "Conduit", "Ambush-Battery", "Void-Shell",
+        "Kinetic-Core", "Tribute-Altar", "Phase-Shift", "Redline-Battery",
+        "Chrono-Anchor", "Catalyst", "Solder", "Siphon-Grid", "Fracture",
+        "Siphon", "Blood-Tax", "Flash-Deploy", "Shimmer", "Overload", "Divert",
+        "Surge-Gate", "Redline-Surge", "Mimic", "Blind-Strike", "False-Step",
+    )
+]
+DECK_2 = [
+    _CARD_DEFINITIONS[name]
+    for name in (
+        "Sentry", "Bastion-Guard", "Phalanx", "Bulwark", "Clay", "Husk",
+        "Quartz", "Pebble", "Shell", "Moss", "Plank", "Root", "Strix", "Ursan",
+        "Cyno", "Vane", "Warden", "Sentinel", "Eclipse", "Ironclad", "Golem",
+        "Gargoyle", "Apex-Hybrid", "Leviathan", "Bastion", "Aegis-Sigil",
+        "Tether", "Iron-Anchor", "Nexus", "Gravity-Well", "Renewal",
+        "Fort-Anchor", "Iron-Wall", "Stone-Sigil", "Mirror-Weave", "Ward-Battery",
+        "Absorb", "Spike-Shield", "Iron-Grip", "Stone-Wall", "Mirror-Trap",
+        "Grid-Freeze", "Counter-Step", "Retaliate", "Purge", "Nova",
+        "Mirror-Trap-Alpha", "Last-Stand",
+    )
+]
+BINDER_RESERVES = [
+    _CARD_DEFINITIONS[name] for name in ("Banish", "Backlash", "Grid-Lock", "Cataclysm")
+]
+
+del _CARD_DEFINITIONS, COMMON_CORE_POOL, CORE_POOL
+
+MASTER_CARD_DATABASE = {
+    card.name: card for card in (*DECK_1, *DECK_2, *BINDER_RESERVES)
 }
 CARD_REGISTRY_IDS = {
     card.name: registry_id

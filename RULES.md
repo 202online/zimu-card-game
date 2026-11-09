@@ -4,12 +4,13 @@ This document records the supplied game notes. It distinguishes stated rules fro
 details that still need clarification; card ability text is not necessarily an
 implemented effect.
 
-## Latest registry intake
+## Registry status
 
-The complete numbered ledger has now been received. The registry is exactly 100
-profiles: 20 shared Common Core cards, 38 Deck 1 exclusives (#021–#058), 38
-Deck 2 exclusives (#059–#096), and 4 Binder Reserves (#097–#100). The Python
-registry preserves this order and assigns those IDs in `CARD_REGISTRY_IDS`.
+The latest complete numbered ledger contains 100 unique profiles: 48 Deck 1
+cards (#001–#048), 48 Deck 2 cards (#049–#096), and 4 Binder Reserves
+(#097–#100). The two decks have no overlapping card names. The Python registry
+preserves this order and assigns those IDs in `CARD_REGISTRY_IDS`; the earlier
+20-card shared pool and 38-card deck partition are superseded.
 
 ## Match and turn
 
@@ -17,8 +18,8 @@ registry preserves this order and assigns those IDs in `CARD_REGISTRY_IDS`.
   0. Redline activates at 10 LP or less.
 - Each turn has four phases:
   1. **Draw:** Draw one card, choosing from the Combatant, Relic, or Tactic pile.
-  2. **Deployment:** Play at most one Zimu from hand to an empty Vanguard slot;
-     activate Relics and cast Surge Tactics.
+  2. **Deployment:** Use the single deployment action to deploy one Zimu from
+     hand to an empty Vanguard slot or perform Core-Recursion.
   3. **Clash:** Declare lane attacks, allow defender counter-traps, then resolve
      combat.
   4. **End:** Resolve cleanup, reset turn-limited effects, and discard until the
@@ -29,6 +30,14 @@ registry preserves this order and assigns those IDs in `CARD_REGISTRY_IDS`.
   those cards move to the Graveyard at the start of Turn 1.
 - Relic and Tactic plays have no per-turn cap. Their LP costs are the values
   printed in their registry entries.
+- **Core-Recursion Law:** Spend the turn's single deployment action to
+  permanently banish three Tactic or Relic cards from your Graveyard, then
+  return one basic Vanilla Core Zimu from your Graveyard to your hand.
+- **Priority Timestamp Resolution Law:** Resolve all attacking declarations
+  and their raw LP damage first. If either scorecard reaches 0 LP in that
+  initial raw damage calculation, the match ends immediately as a knockout.
+  Triggered abilities, healing, and Rearguard Relic adjustments resolve only if
+  both players survive that wave.
 
 ## Board and card locations
 
@@ -39,6 +48,13 @@ registry preserves this order and assigns those IDs in `CARD_REGISTRY_IDS`.
 - A face-up Relic is anchored to its column. A Zimu that moves lanes moves alone;
   Relics stay in place and apply to the next Zimu in their column.
 - Each player has one Graveyard shared by all three card types.
+
+## Physical card print layout
+
+- Full Canvas (With Bleed): 2.72" × 3.72" (816 × 1116 px at 300 DPI).
+- Cut Line: 2.50" × 3.50" (750 × 1050 px).
+- Safe Zone: 2.25" × 3.25" (675 × 975 px).
+- All text and bottom-left ATK/HP stats must stay inside the Safe Zone.
 
 ## Rank and tribute scale
 
@@ -86,7 +102,7 @@ stat ranges or tribute requirements.
 
 ## Current engine coverage
 
-The Python engine models the 100-card registry, one-Zimu-per-turn deployment,
-and basic lane clashes. Draw piles, turn phases, Relic effects, Tactics,
-mulligans, tribute enforcement, face-down cards, and win/forfeit checks still
-need implementation.
+The Python engine models the last complete 100-card registry,
+one-Zimu-per-turn deployment, and basic lane clashes. Draw piles, turn phases,
+Relic effects, Tactics, mulligans, tribute enforcement, face-down cards, and
+win/forfeit checks still need implementation.

@@ -4,8 +4,6 @@ from zimu_engine import (
     BINDER_RESERVES,
     CARD_REGISTRY_BY_ID,
     CARD_REGISTRY_IDS,
-    COMMON_CORE_POOL,
-    CORE_POOL,
     DECK_1,
     DECK_2,
     MASTER_CARD_DATABASE,
@@ -20,7 +18,6 @@ from zimu_engine import (
 class CardDatabaseTests(unittest.TestCase):
     def test_master_database_indexes_each_card_definition(self):
         definitions = [
-            *COMMON_CORE_POOL.values(),
             *DECK_1,
             *DECK_2,
             *BINDER_RESERVES,
@@ -31,14 +28,20 @@ class CardDatabaseTests(unittest.TestCase):
         for card in definitions:
             self.assertIs(MASTER_CARD_DATABASE[card.name], card)
         self.assertEqual(CARD_REGISTRY_IDS["Scrip"], 1)
-        self.assertEqual(CARD_REGISTRY_IDS["Spark"], 21)
-        self.assertEqual(CARD_REGISTRY_IDS["Clay"], 59)
+        self.assertEqual(CARD_REGISTRY_IDS["Spark"], 7)
+        self.assertEqual(CARD_REGISTRY_IDS["Slasher"], 20)
+        self.assertEqual(CARD_REGISTRY_IDS["Sentry"], 49)
         self.assertEqual(CARD_REGISTRY_IDS["Banish"], 97)
+        slasher = MASTER_CARD_DATABASE["Slasher"]
+        self.assertEqual((slasher.atk, slasher.hp, slasher.lp_cost), (6, 1, 2))
+        self.assertIs(slasher.rank, Rank.MILITIA)
         self.assertIs(CARD_REGISTRY_BY_ID[100], MASTER_CARD_DATABASE["Cataclysm"])
-        self.assertIs(CORE_POOL, COMMON_CORE_POOL)
-        self.assertEqual(len(DECK_1), 38)
-        self.assertEqual(len(DECK_2), 38)
+        self.assertEqual(len(DECK_1), 48)
+        self.assertEqual(len(DECK_2), 48)
         self.assertEqual(len(BINDER_RESERVES), 4)
+        self.assertTrue({card.name for card in DECK_1}.isdisjoint(
+            card.name for card in DECK_2
+        ))
 
 
 class DeployTests(unittest.TestCase):
