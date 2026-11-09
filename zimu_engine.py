@@ -29,36 +29,37 @@ class Card:
     text: str = "Vanilla"
 
 
-CORE_POOL = {
+COMMON_CORE_POOL = {
     "Scrip": Card("Scrip", CardType.ZIMU, Rank.CORE, 1, 1, 0),
     "Mite": Card("Mite", CardType.ZIMU, Rank.CORE, 2, 1, 0),
     "Gnat": Card("Gnat", CardType.ZIMU, Rank.CORE, 2, 0, 0, "Can attack adjacent horizontally instead of forward."),
     "Vapor": Card("Vapor", CardType.ZIMU, Rank.CORE, 1, 2, 0, "When sacrificed for a summon requirement, refund +1 LP."),
     "Dart": Card("Dart", CardType.ZIMU, Rank.CORE, 4, 0, 1),
     "Needle": Card("Needle", CardType.ZIMU, Rank.CORE, 3, 1, 1, "When attacking an empty lane, draw 1 Tactic card."),
-    "Sentry": Card("Sentry", CardType.ZIMU, Rank.MILITIA, 2, 5, 2, "Opposing Core unblocked attackers deal 1 less direct damage."),
+    "Sentry": Card("Sentry", CardType.ZIMU, Rank.MILITIA, 2, 5, 2, "Opposing Core unblocked attackers deal 1 less direct damage to your LP pool."),
     "Bastion-Guard": Card("Bastion-Guard", CardType.ZIMU, Rank.MILITIA, 1, 6, 2),
     "Phalanx": Card("Phalanx", CardType.ZIMU, Rank.MILITIA, 2, 6, 2),
-    "Bulwark": Card("Bulwark", CardType.ZIMU, Rank.MILITIA, 1, 7, 3, "Immune to enemy positioning Tactic spells."),
+    "Bulwark": Card("Bulwark", CardType.ZIMU, Rank.MILITIA, 1, 7, 3, "Permanently immune to enemy positioning Tactic spells."),
     "Focus": Card("Focus", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column gains +2 ATK."),
     "Bastion": Card("Bastion", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column gains +2 HP."),
     "Aegis-Sigil": Card("Aegis-Sigil", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column is immune to Tactic destruction."),
     "Tether": Card("Tether", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column cannot be shifted horizontally."),
     "Iron-Anchor": Card("Iron-Anchor", CardType.RELIC, None, 0, 0, 0, "Front-row Zimu in this column gains +1 HP."),
-    "Fracture": Card("Fracture", CardType.TACTIC, None, 0, 0, 2, "Shatter one friendly frontline Zimu to draw 3 cards. [Surge]"),
-    "Siphon": Card("Siphon", CardType.TACTIC, None, 0, 0, 0, "-2 enemy HP threshold until End Phase. [Surge]"),
-    "Blood-Tax": Card("Blood-Tax", CardType.TACTIC, None, 0, 0, 0, "-2 enemy HP threshold until End Phase. [Surge]"),
-    "Flash-Deploy": Card("Flash-Deploy", CardType.TACTIC, None, 0, 0, 1, "Draw 2 cards from Combatant deck. [Surge]"),
-    "Shimmer": Card("Shimmer", CardType.TACTIC, None, 0, 0, 0, "Flip friendly card face-down and shuffle its lane slot. [Surge]"),
+    "Fracture": Card("Fracture", CardType.TACTIC, None, 0, 0, 2, "Shatter one friendly active frontline Zimu to draw 3 cards immediately. [Surge]"),
+    "Siphon": Card("Siphon", CardType.TACTIC, None, 0, 0, 0, "Reduce a targeted enemy monster's current HP threshold by 2 points until End Phase. [Surge]"),
+    "Blood-Tax": Card("Blood-Tax", CardType.TACTIC, None, 0, 0, 0, "Melt away -2 HP threshold from a targeted enemy blocker until End Phase. [Surge]"),
+    "Flash-Deploy": Card("Flash-Deploy", CardType.TACTIC, None, 0, 0, 1, "Draw 2 cards immediately from your Combatant deck. [Surge]"),
+    "Shimmer": Card("Shimmer", CardType.TACTIC, None, 0, 0, 0, "Flips a friendly card face-down and shuffles its lane slot. [Surge]"),
 }
 
+CORE_POOL = COMMON_CORE_POOL
 
 DECK_1 = [
     Card("Spark", CardType.ZIMU, Rank.CORE, 3, 1, 0), Card("Shard", CardType.ZIMU, Rank.CORE, 4, 0, 0),
     Card("Bolt", CardType.ZIMU, Rank.CORE, 3, 0, 1), Card("Flint", CardType.ZIMU, Rank.CORE, 2, 1, 0),
     Card("Twig", CardType.ZIMU, Rank.CORE, 1, 1, 0),     Card("Blink", CardType.ZIMU, Rank.CORE, 3, 1, 2, "When played, swap positions with another face-up teammate."),
-    Card("Wisp", CardType.ZIMU, Rank.CORE, 2, 2, 1, "Once per turn, pay 1 LP to cancel attack and slide lanes."),
-    Card("Sprout", CardType.ZIMU, Rank.CORE, 1, 1, 1, "When played, deploy copy from deck to adjacent slot."),
+    Card("Wisp", CardType.ZIMU, Rank.CORE, 2, 2, 1, "Once per turn, pay 1 LP to cancel attack and slide or swap lanes."),
+    Card("Sprout", CardType.ZIMU, Rank.CORE, 1, 1, 1, "When played, deploy an additional Sprout from deck to an adjacent slot."),
     Card("Talon", CardType.ZIMU, Rank.MILITIA, 4, 1, 2, "Attacking an empty slot deals 6 direct damage instead of 4."),
     Card("Lycos", CardType.ZIMU, Rank.MILITIA, 4, 2, 3, "Spend 4 LP to resurrect Lycos from Graveyard to empty slot."),
     Card("Ruin", CardType.ZIMU, Rank.MILITIA, 4, 5, 3, "In Redline State, stats permanently mutate into [8 ATK / 2 HP]."),
@@ -89,19 +90,13 @@ DECK_1 = [
     Card("Mimic", CardType.TACTIC, None, 0, 0, 1, "Copy the effect of any 0 LP Tactic card sitting in opponent's Graveyard. [Surge]"),
     Card("Blind-Strike", CardType.TACTIC, None, 0, 0, 2, "Attack a face-down Ambush card without forcing it to flip face-up. [Surge]"),
     Card("False-Step", CardType.TACTIC, None, 0, 0, 1, "⚡ CLASH WINDOW. Force attacker's ATK to match its own printed HP. [Reflex]"),
-    Card("Banish", CardType.TACTIC, None, 0, 0, 2, "Permanently remove exactly 1 targeted card in any graveyard from the match. [Surge]"),
-    Card("Backlash", CardType.TACTIC, None, 0, 0, 2, "⚡ CLASH WINDOW. Cancel attack; opponent takes monster's ATK as pure LP damage. [Reflex]"),
-    Card("Grid-Lock", CardType.TACTIC, None, 0, 0, 2, "Freeze a column lane; cards cannot be shifted or manipulated for a turn. [Surge]"),
-    Card("Recalibrate", CardType.TACTIC, None, 0, 0, 0, "Return an active friendly face-up Relic safely back to your hand. [Surge]"),
-    Card("Tribute-Toll", CardType.TACTIC, None, 0, 0, 1, "Force your opponent to immediately choose and Shatter 1 of their own Core units. [Surge]"),
-    Card("Cataclysm", CardType.TACTIC, None, 0, 0, 4, "Board wipe. Instantly shatter all face-up frontline Zimu on both sides. [Surge]"),
 ]
 
 
 DECK_2 = [
     Card("Clay", CardType.ZIMU, Rank.CORE, 0, 4, 1), Card("Husk", CardType.ZIMU, Rank.CORE, 0, 3, 0),
     Card("Quartz", CardType.ZIMU, Rank.CORE, 0, 3, 1),
-    Card("Pebble", CardType.ZIMU, Rank.CORE, 0, 3, 1, "When deployed, protect one friendly active Relic from bounce/disruption."),
+    Card("Pebble", CardType.ZIMU, Rank.CORE, 0, 3, 1, "When deployed, protect one friendly active Relic from disruption."),
     Card("Shell", CardType.ZIMU, Rank.CORE, 0, 4, 1),     Card("Moss", CardType.ZIMU, Rank.CORE, 1, 3, 0, "When Shattered in battle, heal your scorecard by +2 LP."),
     Card("Plank", CardType.ZIMU, Rank.CORE, 0, 4, 0),
     Card("Root", CardType.ZIMU, Rank.CORE, 1, 2, 0, "Enemy units cannot slide out of this lane column."),
@@ -134,19 +129,26 @@ DECK_2 = [
     Card("Iron-Grip", CardType.TACTIC, None, 0, 0, 2, "⚡ CLASH WINDOW. Freeze an oncoming attacker's horizontal movements. [Reflex]"),
     Card("Stone-Wall", CardType.TACTIC, None, 0, 0, 1, "⚡ CLASH WINDOW. Nullify all incoming overflow pierce damage down a column. [Reflex]"),
     Card("Mirror-Trap", CardType.TACTIC, None, 0, 0, 2, "⚡ CLASH WINDOW. Reflect a cast enemy Tactic spell effect back at them. [Reflex]"),
-    Card("Grid-Freeze", CardType.TACTIC, None, 0, 0, 1, "⚡ CLASH WINDOW. Force an attacking lane column to close instantly after this battle. [Reflex]"),
-    Card("Counter-Step", CardType.TACTIC, None, 0, 0, 0, "⚡ CLASH WINDOW. Swap positions of two active defenders before math hits. [Reflex]"),
-    Card("Retaliate", CardType.TACTIC, None, 0, 0, 2, "⚡ CLASH WINDOW. Force defender to strike back dealing its HP as damage to attacker. [Reflex]"),
-    Card("Purge", CardType.TACTIC, None, 0, 0, 1, "Choose and discard 1 card from opponent's hand at random. [Surge]"),
-    Card("Nova", CardType.TACTIC, None, 0, 0, 3, "Clear all Relics sitting across all back-row slots on the board. [Surge]"),
-    Card("Mirror-Trap-Alpha", CardType.TACTIC, None, 0, 0, 2, "⚡ CLASH WINDOW. Steal an incoming counter-trap and apply it to your unit. [Reflex]"),
-    Card("Blind-Block", CardType.TACTIC, None, 0, 0, 1, "⚡ CLASH WINDOW. Block an oncoming attack using a face-down Ambush card's hidden HP. [Reflex]"),
-    Card("Deflect", CardType.TACTIC, None, 0, 0, 1, "⚡ CLASH WINDOW. Reroute an incoming lane attack to hit your highest-HP slot. [Reflex]"),
-    Card("Last-Stand", CardType.TACTIC, None, 0, 0, 0, "Trigger only at 5 LP or less. Front Zimu gains infinite HP for one battle. [Reflex]"),
+]
+
+BINDER_RESERVES = [
+    Card("Banish", CardType.TACTIC, None, 0, 0, 2, "Permanently remove exactly 1 targeted card in any graveyard from the match. [Surge]"),
+    Card("Backlash", CardType.TACTIC, None, 0, 0, 2, "⚡ CLASH WINDOW. Cancel attack; opponent takes monster's ATK as pure LP damage. [Reflex]"),
+    Card("Grid-Lock", CardType.TACTIC, None, 0, 0, 2, "Freeze a column lane; cards cannot be shifted or manipulated for a turn. [Surge]"),
+    Card("Cataclysm", CardType.TACTIC, None, 0, 0, 4, "Board wipe. Instantly shatter all face-up frontline Zimu on both sides. [Surge]"),
 ]
 
 MASTER_CARD_DATABASE = {
-    card.name: card for card in (*CORE_POOL.values(), *DECK_1, *DECK_2)
+    card.name: card
+    for card in (*COMMON_CORE_POOL.values(), *DECK_1, *DECK_2, *BINDER_RESERVES)
+}
+CARD_REGISTRY_IDS = {
+    card.name: registry_id
+    for registry_id, card in enumerate(MASTER_CARD_DATABASE.values(), start=1)
+}
+CARD_REGISTRY_BY_ID = {
+    registry_id: MASTER_CARD_DATABASE[card_name]
+    for card_name, registry_id in CARD_REGISTRY_IDS.items()
 }
 
 

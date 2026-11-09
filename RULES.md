@@ -4,6 +4,13 @@ This document records the supplied game notes. It distinguishes stated rules fro
 details that still need clarification; card ability text is not necessarily an
 implemented effect.
 
+## Latest registry intake
+
+The complete numbered ledger has now been received. The registry is exactly 100
+profiles: 20 shared Common Core cards, 38 Deck 1 exclusives (#021–#058), 38
+Deck 2 exclusives (#059–#096), and 4 Binder Reserves (#097–#100). The Python
+registry preserves this order and assigns those IDs in `CARD_REGISTRY_IDS`.
+
 ## Match and turn
 
 - Each player starts at 40 Life Points (LP). A player loses when their LP reaches
@@ -16,10 +23,12 @@ implemented effect.
      combat.
   4. **End:** Resolve cleanup, reset turn-limited effects, and discard until the
      hand is at most eight cards.
-- The notes describe a pre-game eight-card mulligan: put the opening hand face
-  down in an out-of-play Mulligan Pile, lose 5 LP, and redraw four Zimu, two
+- The notes describe a pre-game eight-card paid Mulligan: banish the opening
+  hand face-down, lose 5 LP, and redraw four Zimu, two
   Relics, and two Tactics. A player may mulligan at most twice. The notes say
   those cards move to the Graveyard at the start of Turn 1.
+- Relic and Tactic plays have no per-turn cap. Their LP costs are the values
+  printed in their registry entries.
 
 ## Board and card locations
 
@@ -35,10 +44,10 @@ implemented effect.
 
 | Rank | Border | Printed scale | Deployment cost | Tribute requirement |
 |---|---|---:|---:|---|
-| Core | Green | ATK + HP: 1–4 | 0–1 LP | None stated |
-| Militia | Yellow | ATK + HP: 5–10 | 2–3 LP | None stated |
-| Mythic | Red | ATK + HP: 11–16 | 4–5 LP | Shatter 2 Core or 1 Militia |
-| Apex | Orange | ATK + HP: 17–20 | 6–8 LP | Shatter 3 Core or 2 Militia |
+| Core | Emerald Green | ATK + HP: 1–4 | 0–1 LP | None stated |
+| Militia | Amber Yellow | ATK + HP: 5–10 | 2–3 LP | None stated |
+| Mythic | Crimson Red | ATK + HP: 11–16 | 4–5 LP | Shatter 2 active friendly Core or 1 active friendly Militia |
+| Apex | Volcanic Orange | ATK + HP: 17–20 | 6–8 LP | Shatter 3 active friendly Core or 2 active friendly Militia |
 
 These are scale descriptions from the rules notes; the engine does not yet enforce
 stat ranges or tribute requirements.
@@ -57,23 +66,17 @@ stat ranges or tribute requirements.
   empty lane safely. It implodes only when engaged in battle and hit by at least
   1 ATK.
 - Redline activates at 10 LP or less and can mutate card abilities.
-- An un-tributed Mythic or Apex revealed on the opponent's turn dissolves and
-  causes an unmitigated direct empty-lane strike. At match end all face-down
-  cards are revealed; an illegal un-tributed card causes forfeiture.
+- If an opponent's attack flips a face-down card and reveals an un-tributed
+  Mythic or Apex, it implodes for 0 damage and the attack scores a full,
+  unmitigated direct empty-lane strike. At match end all face-down cards are
+  revealed; a hidden un-tributed Mythic or Apex causes match forfeit and
+  disqualification.
 
 ## Clarifications needed
 
-- **Support-card costs conflict:** The phase rules say Relics and Tactics cost
-  0 LP from hand, but many Tactic definitions have nonzero `lp_cost` values and
-  describe paying those costs. Confirm whether the cost field should be ignored
-  for support cards, or whether the phase rule is inaccurate.
-- **Card count conflict:** The source calls this a 100-card database, while the
-  supplied lists contain 20 shared cards, 44 Deck 1 cards, and 47 Deck 2 cards
-  (111 named definitions if all are distinct). Confirm whether the 100-card
-  total or the per-section counts are intended.
-- **Tribute procedure:** The required ranks and quantities are given, but the
-  notes do not say which zones can supply Tributes, when they are chosen, or
-  whether the sacrificed cards must be face-up.
+- **Tribute procedure:** The required ranks and active-field source are given,
+  but the notes do not define how Catalyst changes the requirement or whether
+  the tribute choice is made before or after paying LP.
 - **Zero-ATK versus zero-HP:** The zero-HP rule requires a hit of at least 1 ATK,
   while the general shatter formula also destroys a 0-HP defender when a 0-ATK
   attacker meets the `ATK >= HP` threshold. The engine currently treats that
@@ -83,7 +86,7 @@ stat ranges or tribute requirements.
 
 ## Current engine coverage
 
-The Python engine currently models card data, one-Zimu-per-turn deployment, and
-basic lane clashes. Draw piles, turn phases, Relic effects, Tactics, mulligans,
-tribute enforcement, face-down cards, and win/forfeit checks still need
-implementation.
+The Python engine models the 100-card registry, one-Zimu-per-turn deployment,
+and basic lane clashes. Draw piles, turn phases, Relic effects, Tactics,
+mulligans, tribute enforcement, face-down cards, and win/forfeit checks still
+need implementation.

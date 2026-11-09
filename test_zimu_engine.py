@@ -1,6 +1,10 @@
 import unittest
 
 from zimu_engine import (
+    BINDER_RESERVES,
+    CARD_REGISTRY_BY_ID,
+    CARD_REGISTRY_IDS,
+    COMMON_CORE_POOL,
     CORE_POOL,
     DECK_1,
     DECK_2,
@@ -15,10 +19,26 @@ from zimu_engine import (
 
 class CardDatabaseTests(unittest.TestCase):
     def test_master_database_indexes_each_card_definition(self):
-        definitions = [*CORE_POOL.values(), *DECK_1, *DECK_2]
-        self.assertEqual(len(MASTER_CARD_DATABASE), len(definitions))
+        definitions = [
+            *COMMON_CORE_POOL.values(),
+            *DECK_1,
+            *DECK_2,
+            *BINDER_RESERVES,
+        ]
+        self.assertEqual(len(MASTER_CARD_DATABASE), 100)
+        self.assertEqual(len(CARD_REGISTRY_IDS), 100)
+        self.assertEqual(len(CARD_REGISTRY_BY_ID), 100)
         for card in definitions:
             self.assertIs(MASTER_CARD_DATABASE[card.name], card)
+        self.assertEqual(CARD_REGISTRY_IDS["Scrip"], 1)
+        self.assertEqual(CARD_REGISTRY_IDS["Spark"], 21)
+        self.assertEqual(CARD_REGISTRY_IDS["Clay"], 59)
+        self.assertEqual(CARD_REGISTRY_IDS["Banish"], 97)
+        self.assertIs(CARD_REGISTRY_BY_ID[100], MASTER_CARD_DATABASE["Cataclysm"])
+        self.assertIs(CORE_POOL, COMMON_CORE_POOL)
+        self.assertEqual(len(DECK_1), 38)
+        self.assertEqual(len(DECK_2), 38)
+        self.assertEqual(len(BINDER_RESERVES), 4)
 
 
 class DeployTests(unittest.TestCase):
