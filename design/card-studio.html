@@ -510,20 +510,11 @@
       content: "";
     }
 
-    .art-label {
-      position: absolute;
-      right: 10px;
-      bottom: 9px;
-      color: #afc2ce;
-      font-size: clamp(7px, 1.8cqw, 9px);
-      font-weight: 700;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-    }
-
     .rules-box {
       flex: 0 0 auto;
-      min-height: 18%;
+      min-height: 25%;
+      display: flex;
+      flex-direction: column;
       padding: 9px 10px;
       border: 1px solid #a9c5d524;
       border-radius: 2cqw;
@@ -545,6 +536,28 @@
       font-size: clamp(9px, 2.55cqw, 11px);
       line-height: 1.36;
       overflow-wrap: anywhere;
+    }
+
+    .ability-area {
+      flex: 1 0 auto;
+      min-height: 30px;
+    }
+
+    .appearance-copy {
+      margin: 7px 0 0;
+      padding-top: 6px;
+      border-top: 1px solid #a9c5d524;
+      color: #b7c8d3;
+      font-size: clamp(8px, 2.2cqw, 10px);
+      font-style: italic;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .form-error {
+      color: #ffc499;
+      font-size: 11px;
+      line-height: 1.4;
     }
 
     .stats-row {
@@ -731,9 +744,17 @@
       <form class="editor" id="card-form">
         <div class="panel-heading">
           <h2>Card details</h2>
-          <span class="step">Step 1 of 2</span>
+          <span class="step">Card studio</span>
         </div>
         <div class="fields">
+          <div class="field full">
+            <label for="card-select">Choose a card</label>
+            <select id="card-select">
+              <option value="">Custom card</option>
+            </select>
+            <p class="hint">Choose a card to load its details and suggested appearance.</p>
+            <p id="catalog-error" class="form-error" hidden>Card catalog could not be loaded. Custom editing is still available.</p>
+          </div>
           <div class="field full">
             <label for="card-name">Card name</label>
             <input id="card-name" name="name" value="Spark" maxlength="24" autocomplete="off">
@@ -769,8 +790,13 @@
           </div>
           <div class="field full">
             <label for="card-text">Rules text</label>
-            <textarea id="card-text" name="text" maxlength="220">Vanilla</textarea>
-            <p class="hint">Short sentences are easier to scan at table distance.</p>
+            <textarea id="card-text" name="text" maxlength="220"></textarea>
+            <p class="hint">Leave blank for a card without an ability.</p>
+          </div>
+          <div class="field full">
+            <label for="card-appearance">Appearance description</label>
+            <textarea id="card-appearance" name="appearance" maxlength="120">A bright-eyed ember creature with crackling copper horns.</textarea>
+            <p class="hint">A short visual description, separate from gameplay rules.</p>
           </div>
         </div>
         <div class="toggle-row">
@@ -808,11 +834,13 @@
               </div>
               <div class="art-window" aria-label="Abstract Flux artwork placeholder">
                 <div class="flux-core" aria-hidden="true"></div>
-                <span class="art-label">Flux signature · 01</span>
               </div>
               <div class="rules-box">
-                <p class="rules-caption">Ability</p>
-                <p class="rules-copy" id="preview-text">Vanilla</p>
+                <div class="ability-area">
+                  <p class="rules-caption" id="ability-caption" hidden>Ability</p>
+                  <p class="rules-copy" id="preview-text"></p>
+                </div>
+                <p class="appearance-copy" id="preview-appearance">A bright-eyed ember creature with crackling copper horns.</p>
               </div>
               <div class="stats-row">
                 <div class="stats" aria-label="Attack and hit points">
@@ -831,9 +859,11 @@
     <footer class="footer-note">Flux mark, rank accents, and layout are original design elements. Print output is sized to the specified full canvas with bleed.</footer>
   </main>
 
+  <script src="card-catalog.js"></script>
   <script>
     const form = document.querySelector("#card-form");
     const card = document.querySelector("#card");
+    const cardSelect = document.querySelector("#card-select");
     const rankColors = {
       CORE: "#51e6ad",
       MILITIA: "#f0bf55",
@@ -842,8 +872,8 @@
     };
     const typeLabels = {
       ZIMU: "Zimu · Combatant",
-      RELIC: "Relic · Arsenal",
-      TACTIC: "Tactic · Instant",
+      RELIC: "Relic",
+      TACTIC: "Tactic",
     };
 
     function updatePreview() {
@@ -857,7 +887,12 @@
       document.querySelector("#preview-atk").textContent = data.get("atk") || "0";
       document.querySelector("#preview-hp").textContent = data.get("hp") || "0";
       document.querySelector("#preview-cost").textContent = data.get("cost") || "0";
-      document.querySelector("#preview-text").textContent = data.get("text") || "No ability text.";
+      const ability = data.get("text").trim();
+      const appearance = data.get("appearance").trim();
+      document.querySelector("#preview-text").textContent = ability.toLowerCase() === "vanilla" ? "" : ability;
+      document.querySelector("#ability-caption").hidden = !document.querySelector("#preview-text").textContent;
+      document.querySelector("#preview-appearance").textContent = appearance;
+      document.querySelector("#preview-appearance").hidden = !appearance;
 
       card.dataset.type = type;
       card.style.setProperty("--rank", rankColors[rank]);
@@ -866,13 +901,53 @@
       document.querySelector("#hp-field").hidden = type !== "ZIMU";
     }
 
-    form.addEventListener("input", updatePreview);
+    if (Array.isArray(window.ZIMU_CATALOG)) {
+      for (const entry of window.ZIMU_CATALOG) {
+        const option = document.createElement("option");
+        option.value = String(entry.id);
+        option.textContent = `${String(entry.id).padStart(3, "0")} · ${entry.name}`;
+        cardSelect.append(option);
+      }
+    } else {
+      document.querySelector("#catalog-error").hidden = false;
+    }
+
+    cardSelect.addEventListener("change", () => {
+      if (!cardSelect.value) return;
+      const entry = window.ZIMU_CATALOG.find((item) => String(item.id) === cardSelect.value);
+      if (!entry) {
+        document.querySelector("#catalog-error").hidden = false;
+        return;
+      }
+      form.elements.name.value = entry.name;
+      form.elements.type.value = entry.type;
+      form.elements.rank.value = entry.rank || "CORE";
+      form.elements.atk.value = entry.atk;
+      form.elements.hp.value = entry.hp;
+      form.elements.cost.value = entry.cost;
+      form.elements.text.value = entry.text === "Vanilla" ? "" : entry.text;
+      form.elements.appearance.value = entry.appearance;
+      updatePreview();
+    });
+    form.addEventListener("input", (event) => {
+      if (event.target !== cardSelect && event.target.id !== "show-guides") {
+        cardSelect.value = "";
+      }
+      updatePreview();
+    });
     form.addEventListener("change", updatePreview);
     document.querySelector("#show-guides").addEventListener("change", (event) => {
       card.classList.toggle("show-guides", event.target.checked);
     });
     document.querySelector("#print-card").addEventListener("click", () => window.print());
-    updatePreview();
+    const spark = window.ZIMU_CATALOG?.find((entry) => entry.name === "Spark");
+    if (spark) {
+      cardSelect.value = String(spark.id);
+      cardSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    } else {
+      document.querySelector("#catalog-error").hidden = false;
+      updatePreview();
+    }
   </script>
 </body>
 </html>

@@ -4,6 +4,15 @@ Open [`design/card-studio.html`](design/card-studio.html) in a browser to edit
 the basic card fields and see a live preview. The editor works offline and
 requires no packages or external assets.
 
+Choose any of the 100 registry cards to load its stats, ability, and an
+editable, original appearance description. The italic description is a visual
+prompt, not a gameplay effect. Vanilla cards leave the ability area blank.
+Changes in the editor are temporary and do not modify the registry.
+
+Appearance descriptions live in `design/appearances.json`. After changing
+those descriptions or the engine registry, run `python design/build_catalog.py`
+to regenerate `design/card-catalog.js` for the offline studio.
+
 ## Visual direction
 
 The template uses a dark, technical frame with one bright rank accent, short
@@ -28,6 +37,7 @@ hides the guides.
 ## First iteration limits
 
 The art window currently contains an original abstract placeholder rather
-than final character art. The studio is a single-card layout prototype, not a
+than final character art; the appearance descriptions are not illustrations.
+The studio is a single-card layout prototype, not a
 48-card deck builder or print-sheet imposition tool. Confirm printer profile,
 color workflow, and final imagery before commercial printing.
