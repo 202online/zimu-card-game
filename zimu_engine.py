@@ -192,6 +192,9 @@ class PlayerBoard:
         self.has_summoned_this_turn = True
         return "SUCCESS"
 
+    def reset_turn_flags(self) -> None:
+        self.has_summoned_this_turn = False
+
 
 class ClashEngine:
     @staticmethod

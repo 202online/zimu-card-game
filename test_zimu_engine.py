@@ -63,6 +63,14 @@ class DeployTests(unittest.TestCase):
         self.assertEqual(player.deploy_zimu(0, 1), "REJECTED: One-Summon Cap.")
         self.assertEqual(player.hand, [second])
 
+    def test_turn_reset_allows_next_summon(self):
+        player = PlayerBoard("Player")
+        player.hand.extend([Card("First", CardType.ZIMU), Card("Second", CardType.ZIMU)])
+
+        self.assertEqual(player.deploy_zimu(0, 0), "SUCCESS")
+        player.reset_turn_flags()
+        self.assertEqual(player.deploy_zimu(0, 1), "SUCCESS")
+
     def test_rejects_invalid_card_lane_and_unaffordable_cost(self):
         player = PlayerBoard("Player")
         player.hand.extend([
